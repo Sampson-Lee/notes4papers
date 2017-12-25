@@ -115,6 +115,10 @@
         - [Objective](#objective)
         - [Architrcture](#architrcture)
         - [Experiments](#experiments)
+    - [Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks](#unpaired-image-to-image-translation-using-cycle-consistent-adversarial-networks)
+        - [Main idea](#main-idea)
+        - [Motivation](#motivation)
+        - [Formulation](#formulation)
     - [StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation](#stargan-unified-generative-adversarial-networks-for-multi-domain-image-to-image-translation)
         - [Main idea](#main-idea)
         - [Motivation](#motivation)
@@ -955,6 +959,43 @@ From PixelGANs to PatchGANs to ImageGANs
 ![](img/pix2pix_gan.png)
 
  The full 286 × 286 ImageGAN gets a considerably lower FCN-score, which may be because the ImageGAN has many more parameters and greater depth than the 70 × 70 PatchGAN, and may be harder to train.
+
+## Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks
+### Main idea
+The authors present an approach for learning to translate an image from a source domain X to a target domain Y in the absence of paired examples. The goal is to learn a mapping G : X -> Y such that the distribution of images from G(X) is indistinguishable from the distribution Y using an adversarial loss.
+
+Because the mapping is highly under-constrained, we couple it with an inverse mapping F : Y -> X and introduce a cycle consistency loss to enforce F (G(X)) ≈ X (and vice versa).
+
+### Motivation
+
+![](img/cyclegan_data.png)
+
+(1) Image-to-image translation is a class of vision and graphics problems where the goal is to learn the mapping between an input image and an output image using a training set of aligned image pairs. However, for many tasks, paired training data will not be available. 
+
+(2) Obtaining paired training data can be difficult and expensive.For example, only a couple of datasets exist for tasks like semantic segmentation, and they are relatively small. 
+
+### Formulation
+
+![](img/cyclegan_arch.png)
+
+Adversarial Loss
+
+For the mapping function G:X->Y and its discriminator DY
+
+![](img/cyclegan_gan.png)
+
+We introduce a similar adversarial loss for the mapping function F:Y->X and its discriminator DX as well: min(F)max(DX) L(F, DX, Y, X)
+
+
+Cycle Consistency Loss
+
+Adversarial losses alone cannot guarantee that the learned function can map an individual input x(i) to a desired output y(i). To further reduce the space of possible mapping functions, we argue that the learned mapping functions should be cycle-consistent.
+
+![](img/cyclegan_cycle.png)
+
+full objective
+
+![](img/cyclegan_full.png)
 
 ## StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation
 ### Main idea
