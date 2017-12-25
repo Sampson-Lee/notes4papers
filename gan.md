@@ -7,7 +7,7 @@
         - [Global Optimality](#global-optimality)
         - [Training](#training)
         - [Advantages and disadvantages](#advantages-and-disadvantages)
-    - [f-GAN:Training Generative Neural Samplers usingVariational Divergence Minimization](#f-gantraining-generative-neural-samplers-using-variational-divergence-minimization)
+    - [f-GAN:Training Generative Neural Samplers using Variational Divergence Minimization](#f-gantraining-generative-neural-samplers-using-variational-divergence-minimization)
         - [Main idea](#main-idea)
         - [f-divergence](#f-divergence)
         - [Variational Estimation](#variational-estimation)
@@ -29,7 +29,7 @@
         - [Main idea](#main-idea)
         - [EBGAN](#ebgan)
         - [EBGAN USING AUTO-ENCODERS](#ebgan-using-auto-encoders)
-    - [BEGAN: Boundary Equilibrium GenerativeAdversarial Networks](#began-boundary-equilibrium-generative-adversarial-networks)
+    - [BEGAN: Boundary Equilibrium Generative Adversarial Networks](#began-boundary-equilibrium-generative-adversarial-networks)
         - [Main idea](#main-idea)
         - [Auto-encoders loss](#auto-encoders-loss)
         - [Wasserstein distance lower bound](#wasserstein-distance-lower-bound)
@@ -48,7 +48,7 @@
         - [Main idea](#main-idea)
         - [Difficulties of WGAN](#difficulties-of-wgan)
         - [WGAN-GP](#wgan-gp)
-    - [Loss-Sensitive Generative Adversarial Networkson Lipschitz Densities](#loss-sensitive-generative-adversarial-networks-on-lipschitz-densities)
+    - [Loss-Sensitive Generative Adversarial Networks on Lipschitz Densities](#loss-sensitive-generative-adversarial-networks-on-lipschitz-densities)
         - [Main idea](#main-idea)
         - [Motivation](#motivation)
         - [Loss-Sensitive GAN](#loss-sensitive-gan)
@@ -78,7 +78,7 @@
         - [Virtual batch normalization](#virtual-batch-normalization)
         - [Assessment of image quality](#assessment-of-image-quality)
         - [Semi-supervised learning](#semi-supervised-learning)
-    - [Generative Image Modeling using Style andStructure Adversarial Networks](#generative-image-modeling-using-style-and-structure-adversarial-networks)
+    - [Generative Image Modeling using Style and Structure Adversarial Networks](#generative-image-modeling-using-style-and-structure-adversarial-networks)
         - [Main idea](#main-idea)
         - [Structure-GAN](#structure-gan)
         - [Style-GAN](#style-gan)
@@ -104,9 +104,17 @@
         - [Architecture](#architecture)
         - [Models](#models)
         - [Learning](#learning)
+    - [Invertible Conditional GANs for image editing](#invertible-conditional-gans-for-image-editing)
+        - [Main idea](#main-idea)
+        - [Motivation](#motivation)
+        - [Encoder](#encoder)
+        - [cGAN](#cgan)
+        - [Architecture](#architecture)
     - [Image-to-image translation using conditional adversarial nets](#image-to-image-translation-using-conditional-adversarial-nets)
         - [Main idea](#main-idea)
         - [Objective](#objective)
+        - [Architrcture](#architrcture)
+        - [Experiments](#experiments)
     - [StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation](#stargan-unified-generative-adversarial-networks-for-multi-domain-image-to-image-translation)
         - [Main idea](#main-idea)
         - [Motivation](#motivation)
@@ -149,7 +157,7 @@
         - [Loss](#loss)
         - [Training](#training)
 - [Super-Resolution](#super-resolution)
-    - [Photo-Realistic Single Image Super-Resolution Using a Generative AdversarialNetwork](#photo-realistic-single-image-super-resolution-using-a-generative-adversarial-network)
+    - [Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network](#photo-realistic-single-image-super-resolution-using-a-generative-adversarial-network)
         - [Main idea](#main-idea)
         - [Architecture](#architecture)
         - [Generator](#generator)
@@ -211,7 +219,7 @@ step 2: For D fixed, the optimal generator G is to minimize C(G). Since the Jens
 
 (3) Disadvantages: non-convergence, collapse problem, uncontrollable
 
-## f-GAN:Training Generative Neural Samplers usingVariational Divergence Minimization
+## f-GAN:Training Generative Neural Samplers using Variational Divergence Minimization
 
 ### Main idea
 The authors show that the generative-adversarial approach is a special case of an existing more general variational divergence estimation approach, where any f-divergence can be used for training generative neural samplers.
@@ -347,7 +355,7 @@ In authors’ experiments, the discriminator D is structured as an auto-encoder:
 3. To avoid identity mapping, implement the repelling regularizer involves a PT that runs at a representation level.
 ![](img/ebgan_pt.png)
 
-## BEGAN: Boundary Equilibrium GenerativeAdversarial Networks
+## BEGAN: Boundary Equilibrium Generative Adversarial Networks
 
 ### Main idea
 (1) The authors propose a new equilibrium enforcing method paired with a loss derived from the Wasserstein distance for training auto-encoder based Generative Adversarial Networks. 
@@ -521,7 +529,7 @@ experimrnts
 
 ![](img/wgan_gp_algorithm.png)
 
-## Loss-Sensitive Generative Adversarial Networkson Lipschitz Densities
+## Loss-Sensitive Generative Adversarial Networks on Lipschitz Densities
 ### Main idea
 (1) The authors propose a novel Loss-Sensitive GAN(LS-GAN) that learns a loss function to distinguish real and generated samples by the assumption that a real example should have a smaller loss than a generated sample.
 
@@ -702,7 +710,7 @@ We can do semi-supervised learning with any standard classifier by simply adding
 ![](img/imgan_ss.png)
 
 
-## Generative Image Modeling using Style andStructure Adversarial Networks
+## Generative Image Modeling using Style and Structure Adversarial Networks
 ### Main idea
 The authors factorize the image generation process and propose Style and Structure Generative Adversarial Network (S2-GAN) consisting of two components: 
 - the Structure-GAN generates a surface normal map; 
@@ -856,12 +864,61 @@ The CoGAN framework corresponds to a constrained minmax game given by
 
 ![](img/cogan_exp.png)
 
+## Invertible Conditional GANs for image editing
+### Main idea
+(1) The authors evaluate encoders to inverse the mapping of a cGAN, mapping a real image into a latent space and a conditional representation. This allows, for example, to reconstruct and modify real images of faces conditioning on arbitrary attributes. 
+
+(2) Additionally, the authors evaluate the design of cGANs. The combination of an encoder with a cGAN, which we call Invertible cGAN (IcGAN), enables to re-generate real images with deterministic complex modifications.
+
+### Motivation
+The GAN framework lacks an inference mechanism, finding the latent representation of an input image, which is a necessary step for being able to reconstruct and modify real images.
+
+### Encoder
+
+![](img/icgan_arch.png)
+
+The authors train an encoder E once the cGAN has been trained, where the encoder is composed of two sub-encoders: E(z)-encodes an image to latent representation z, E(y)-encodes an image to atrribute information y.
+
+To train Ez, we use the generator to create a dataset of generated images x' and their latent vectors z, and then minimize a squared reconstruction loss L(ez).
+
+![](img/icgan_Ez.png)
+
+For Ey, we initially used generated images x' and their conditional information y' for training. However, we found that generated images tend to be noisier than real ones and, in this specific case, we could improve Ey by directly training with real images and labels from the dataset pdata.
+
+![](img/icgan_Ey.png)
+
+### cGAN
+
+![](img/icgan_cgan.png)
+
+The authors consider two main design decisions concerning cGANs: the optimal conditional position y on the generator and discriminator, the best approach to sample conditional information for the generator.
+
+![](img/icgan_position.png)
+
+The best accuracy is achieved by inserting y in the first convolutional layer of the discriminator and at the input level for the generator.
+
+different sampling approaches:
+- Kernel density estimation: randomly sampling from a kernel
+- Direct interpolation: interpolate between label vectors y from the training set
+- Sampling from the training set y'~p(y), p(y) = p(data): Use directly the real labels y from the training set pdata. 
+
+In this case where the attributes of an image are binary, one attribute vector y could describe a varied and large enough subset of images, preventing the model from overfitting given y. The authors will
+directly sample y from pdata because Kernel density estimation and interpolation are not suitable for binary ones.
+
+### Architecture
+Detailed generator and discriminator architecture
+
+![](img/icgan_ganarch.png)
+
+the architecture of the IND encoder: Batch Normalization and non-linear activation functions are removed from the last layer to guarantee that the output distribution is similar to pz = N (0; 1). 
+
+![](img/icgan_ganenc.png)
+
 ## Image-to-image translation using conditional adversarial nets
 ### Main idea
 The authors investigate conditional adversarial networks, called pix2pix, as a general-purpose solution to image-to-image translation problems. 
 
-These networks not only learn the mapping from
-input image to output image, but also learn a loss function to train this mapping, which makes it possible to apply the same generic approach to problems that traditionally would require very different loss formulations.
+These networks not only learn the mapping from input image to output image, but also learn a loss function to train this mapping, which makes it possible to apply the same generic approach to problems that traditionally would require very different loss formulations.
 
 ![](img/pix2pix_overview.png)
 
@@ -872,6 +929,32 @@ input image to output image, but also learn a loss function to train this mappin
 Without z, the net could still learn a mapping from x to y, but would produce deterministic outputs, and therefore fail to match any distribution other than a delta function. 
 
 But in experiments, we found that the generator simply learned to ignore the noise and dropout produce only minor stochasticity in generated images.
+
+Designing conditional GANs that produce highly stochastic output, and thereby capture the full entropy of the conditional distributions they model, is an important question left open by the present work.
+
+### Architrcture
+Unet
+
+For many image translation problems, there is a great deal of low-level information shared between the input and output, and it would be desirable to shuttle this information directly across the net.
+
+![](img/pix2pix_arch.png)
+
+PatchGAN
+
+ L1 term forces low-frequency correctness, which motivates restricting the GAN discriminator to only model high-frequency structure. We design a discriminator architecture – which we term a PatchGAN – that only penalizes structure at the scale of patches. This discriminator tries to classify if each N × N patch in an image is real or fake. 
+
+ Such a discriminator effectively models the image as a Markov random field, assuming independence between pixels separated by more than a patch diameter.
+
+### Experiments
+analysis of the generator architecture
+
+![](img/pix2pix_unet.png)
+
+From PixelGANs to PatchGANs to ImageGANs
+
+![](img/pix2pix_gan.png)
+
+ The full 286 × 286 ImageGAN gets a considerably lower FCN-score, which may be because the ImageGAN has many more parameters and greater depth than the 70 × 70 PatchGAN, and may be harder to train.
 
 ## StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation
 ### Main idea
@@ -1187,7 +1270,7 @@ The global adversarial loss and semantic regularization are incorporated at the 
 ![](img/completegan_exp.png)
 
 # Super-Resolution
-## Photo-Realistic Single Image Super-Resolution Using a Generative AdversarialNetwork
+## Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network
 ### Main idea
 1. The authors present SRGAN, a generative adversarial network (GAN) for image superresolution (SR) with a perceptual loss function which consists of an adversarial loss and a content loss.
 
