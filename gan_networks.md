@@ -27,12 +27,6 @@
         - [Style-GAN with Pixel-wise Constraints](#style-gan-with-pixel-wise-constraints)
         - [Joint Learning for S2-GAN](#joint-learning-for-s2-gan)
         - [Experiments](#experiments)
-    - [Pose Guided Person Image Generation](#pose-guided-person-image-generation)
-        - [Main idea](#main-idea)
-        - [Architecture](#architecture)
-        - [Stage-I:Pose integration](#stage-ipose-integration)
-        - [Stage-II:Image refinement](#stage-iiimage-refinement)
-        - [Stage-III: Discriminator](#stage-iii-discriminator)
     - [Learning from Simulated and Unsupervised Images through Adversarial Training](#learning-from-simulated-and-unsupervised-images-through-adversarial-training)
         - [Main idea](#main-idea)
         - [Architecture](#architecture)
@@ -193,46 +187,7 @@ After training the Structure-GAN and Style-GAN independently, we merge all netwo
 ![](img/ssgan_exp.png)
 
 
-## Pose Guided Person Image Generation
-### Main idea
-The authors propose the novel Pose Guided Person Generation network(PG2), which utilizes the pose information explicitly and consists of two key stages: pose integration and image refinement.
 
-### Architecture
-![](img/PG2_arch.png)
-
-### Stage-I:Pose integration
-Generator G1: a U-Net-like architecture convolutional autoencoder with skip connections.
-
-![](img/PG2_unet.png)
-
-- Stacked convolutional layers integrate the information of I(a) and P(b) and transfer information to neighboring body parts.
-- A fully connected layer is used such that information between distant body parts can exchange information.
-- Skip connections between encoder and decoder help propagate image information directly from input to output.
-
-Pose mask loss: we adopt L1 loss between generation and target images with a pose mask MB, which alleviates the influence of background from the condition image.
-
-![](img/PG2_mask.png)
-
-The output of G1 is blurry because the L1 loss encourages the result to be an average of all possible cases. However, G1 does capture the global structural information specified by the target pose, as well as other low-frequency information such as the color of clothes. 
-
-![](img/PG2_loss_g1.png)
-
-### Stage-II:Image refinement
-Generator G2: G2 aims to generate an appearance difference map between initial result I’(b) and target I(b), with I’(b) and I(a) as input.
-
-![](img/PG2_refine.png)
-
-The use of difference maps speeds up the convergence of model training since the model focuses on learning the missing appearance details.
-
-The fully-connected layer is removed from   the U-Net which helps to preserve more details from the input because a fully-connected layer compresses a lot of information contained in the input.
-
-### Stage-III: Discriminator
-Discriminator D: D to recognize the pairs’ fakery (I’(b2),I(a)) vs (I(b),I(a)), which encourages D to learn the distinction between I’(b2) and I(b) instead of only the distinction between synthesized and natural images.
-
-![](img/PG2_loss.png)
-
-- Without pairwise input, we worry that G2 will be mislead to directly output I(a) which is natural by itself instead of refining the coarse result of the first stage I’(b1).
-- When λ is small, the adversarial loss dominates the training and it is more likely to generate artifacts; when λ is big, the generator with a basic L1 loss dominates the training, making the whole model generate blurry results.
 
 ## Learning from Simulated and Unsupervised Images through Adversarial Training
 ### Main idea

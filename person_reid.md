@@ -1,5 +1,103 @@
 # Re-identification
 
+## Pose Guided Person Image Generation
+### Main idea
+The authors propose the novel Pose Guided Person Generation network(PG2), which utilizes the pose information explicitly and consists of two key stages: pose integration and image refinement.
+
+### Architecture
+![](img/PG2_arch.png)
+
+### Stage-I:Pose integration
+Generator G1: a U-Net-like architecture convolutional autoencoder with skip connections.
+
+![](img/PG2_unet.png)
+
+- Stacked convolutional layers integrate the information of I(a) and P(b) and transfer information to neighboring body parts.
+- A fully connected layer is used such that information between distant body parts can exchange information.
+- Skip connections between encoder and decoder help propagate image information directly from input to output.
+
+Pose mask loss: we adopt L1 loss between generation and target images with a pose mask MB, which alleviates the influence of background from the condition image.
+
+![](img/PG2_mask.png)
+
+The output of G1 is blurry because the L1 loss encourages the result to be an average of all possible cases. However, G1 does capture the global structural information specified by the target pose, as well as other low-frequency information such as the color of clothes. 
+
+![](img/PG2_loss_g1.png)
+
+### Stage-II:Image refinement
+Generator G2: G2 aims to generate an appearance difference map between initial result I’(b) and target I(b), with I’(b) and I(a) as input.
+
+![](img/PG2_refine.png)
+
+The use of difference maps speeds up the convergence of model training since the model focuses on learning the missing appearance details.
+
+The fully-connected layer is removed from   the U-Net which helps to preserve more details from the input because a fully-connected layer compresses a lot of information contained in the input.
+
+### Stage-III: Discriminator
+Discriminator D: D to recognize the pairs’ fakery (I’(b2),I(a)) vs (I(b),I(a)), which encourages D to learn the distinction between I’(b2) and I(b) instead of only the distinction between synthesized and natural images.
+
+![](img/PG2_loss.png)
+
+- Without pairwise input, we worry that G2 will be mislead to directly output I(a) which is natural by itself instead of refining the coarse result of the first stage I’(b1).
+- When λ is small, the adversarial loss dominates the training and it is more likely to generate artifacts; when λ is big, the generator with a basic L1 loss dominates the training, making the whole model generate blurry results.
+
+
+## Deformable GANs for Pose-based Human Image Generation
+### Main idea
+Specifically, given an image of a person and a target pose, we synthesize a new image of that person in the novel pose. In order to deal with pixel-to-pixel misalignments caused by the pose differences, the authors introduce deformable skip connections in the generator of our Generative Adversarial Network. 
+
+Moreover, a nearest-neighbour loss is proposed instead of the common L1 and L2 losses in order to match the details of the generated image with the target image.
+
+### Motivation
+Pose-based human-being image generation is motivated by the interest in synthesizing videos with non-trivial human movements or in generating rare poses for human pose estimation or re-identification training datasets.
+
+Most of these methods have problems when dealing with large spatial deformations between the conditioning and the target image. For instance, the assumption used in U-Net architecture is that x and y are roughly aligned with each other and they represent the same underlying structure. 
+
+### Architecture
+
+![](img/deformablegan_arch.png)
+
+P(x) = (p1,...pk) is a sequence of k 2D points describing the locations of the human-body joints in x, which is extracted using the Human Pose Estimator.
+
+ H = H(P(x)) is composed of k heat maps, where Hj (1 ≤ j ≤ k) is a 2D matrix of the same dimension as the original image. If pj is the j-th joint location, then:
+
+![](img/deformablegan_H.png)
+
+The joint locations in x(a) and H(a) are spatially aligned (by construction), while in H(b) they are different. Hence, H(b) is not concatenated with the other input tensors, because the convolutional layers in the encoder part of G have a small receptive field which cannot capture large spatial displacements.
+
+Specifically, x(a) and H(a) are concatenated and processed using a convolutional stream of the encoder while H(b) is processed by means of a second convolutional stream, with no-shared weights. The feature maps of the first stream are then fused with the layer-specific convolutional feature maps of the second stream in the decoder part of G after a pose-driven spatial deformation performed by our deformable skip connections.
+
+### Deformable skip connections
+
+![](img/deformablegan_affine.png)
+
+1) Decomposing an articulated body in a set of rigid subparts
+
+2) Computing a set of affine transformations fh(·;kh) using Least Squares Error
+![](img/deformablegan_LSE.png)
+
+3) Combining affine transformations to approximate the object deformation.
+![](img/deformablegan_deform.png)
+
+### Training
+D and G are trained using a combination of a standard conditional adversarial loss LcGAN with our proposed nearest-neighbour loss LNN.
+
+![](img/deformablegan_loss.png)
+
+We hypothesize pixel-to-pixel loss such as L1 fails to tolerate small spatial misalignments between x' and xb. In order to alleviate this problem, we propose to use a nearest-neighbour loss LNN based on the following definition of image difference:
+
+![](img/deformablegan_nnloss.png)
+
+total objective
+
+![](img/deformablegan_totalloss.png)
+
+### Experiments
+![](img/deformablegan_exp.png)
+
+
+![](img/deformablegan_exp2.png)
+
 ## Camera Style Adaptation for Person Re-identification
 ### Main idea
 Being a cross-camera retrieval task, person reidentification suffers from image style variations caused by different cameras. In this paper, we explicitly consider this challenge by introducing camera style (CamStyle) adaptation, where CamStyle can serve as a data augmentation approach that smooths the camera style disparities.
