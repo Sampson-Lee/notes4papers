@@ -40,6 +40,14 @@
         - [Local adversarial loss](#local-adversarial-loss)
         - [perceptual loss](#perceptual-loss)
         - [Loss function](#loss-function)
+    - [Face Synthesis from Visual Attributes via Sketch using Conditional VAEs and GANs](#face-synthesis-from-visual-attributes-via-sketch-using-conditional-vaes-and-gans)
+        - [Main idea](#main-idea)
+        - [Motivation](#motivation)
+        - [Architecture](#architecture)
+        - [Stage 1: Attribute-to-Sketch](#stage-1-attribute-to-sketch)
+        - [Stage 2: Sketch-to-Sketch (S2S)](#stage-2-sketch-to-sketch-s2s)
+        - [Stage 3: Sketch-to-Face (S2F)](#stage-3-sketch-to-face-s2f)
+    - [Experiments](#experiments)
 
 <!-- /TOC -->
 
@@ -273,3 +281,64 @@ If the sum of discrepancy between the current learned representations of transfo
 Given a pair of data (x, y) ∈ (X(input), Y(ground-truth)), the loss function of image transformation network J(T) and the loss function of discriminative network J(D) are formally defined as:
 
 ![](img/Simgan_loss.png)
+
+
+## Face Synthesis from Visual Attributes via Sketch using Conditional VAEs and GANs
+
+### Main idea
+the authors synthesize face images from attributes and
+text descriptions in three stages: 
+(1) Synthesis of facial sketch from attributes using a CVAE architecture, 
+(2) Enhancement of coarse sketches to produce sharper sketches using a GANbased framework, and 
+(3) Synthesis of face from sketch using another GAN-based network
+
+### Motivation
+Visual description-based face synthesis has many applications in law enforcement and entertainment.
+
+### Architecture
+Three-stage training network: 
+
+![](img/FSASgan_train.png)
+
+Testing phase:
+
+![](img/FSASgan_test.png)
+
+### Stage 1: Attribute-to-Sketch
+In the A2S stage, the authors adapt the CVAE architecture. Given a texture attribute vector a, noise vector n, and ground-truth sketch s, we aim to learn a model Pθ(s|a z), which can model the distribution of s and generate s(r). The objective is to find the best parameter θ which maximizes the loglikelihood log Pθ(s|a).
+
+![](img/FSASgan_A2S.png)
+
+The encoder q(φ) takes sketch and attributes as input, whereas q(β) takes noise and attribute vectors as input. The overall loss function of the A2S stage is as follows: 
+
+![](img/FSASgan_loss1.png)
+
+KL(Qφ(z|s a)||Pθ(z)) and KL(Qβ(z|n a)||Pθ(z)), are the regularization terms in order to enforce the latent variable z ~ Qφ(z|s a) and z ~ Qβ(z|n a) both match the prior normal distribution, Pθ(z).
+
+
+### Stage 2: Sketch-to-Sketch (S2S)
+S2S network consists of a generator sub-network G2 (based on UNet and DenseNet architectures) conditioned on the encoded attribute vector from the A2S stage and a patch-based discriminator subnetwork D2. 
+
+![](img/FSASgan_S2S.png)
+
+UNet incorporates longer skip connections to preserve low-level features, DenseNet employs short range connections within microblocks resulting in maximum information flow between layers in addition to an efficient network.
+
+Additionally, patch-based discriminator ensures preserving of high-frequency details which are usually lost when only L1 loss is used. 
+
+![](img/FSASgan_loss2.png)
+
+### Stage 3: Sketch-to-Face (S2F)
+The visual attribute vector is combined with the latent representation to produce attribute-preserved image reconstructions.
+
+![](img/FSASgan_S2F.png)
+
+The network parameters for the S2F stage are learned by minimizing
+
+![](img/FSASgan_loss3.png)
+
+## Experiments
+the authors show the image synthesis capability of our network by manipulating the input attribute and noise vectors. Note that, the testing phase of our network takes attribute vector and noise as inputs and produces face reconstruction as the output. 
+
+![](img/FSASgan_exp.png)
+
+![](img/FSASgan_exp2.png)

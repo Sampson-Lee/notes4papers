@@ -200,3 +200,4 @@ To provide a strong driving force for continuously improving the re-rendering pe
 TD-GAN is composed of R, D, G and g, which can be optimized and learned using the alternating optimization strategy.
 
 ![](img/tdgan_train.png)
+
