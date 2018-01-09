@@ -41,7 +41,14 @@
         - [Stage 1: Attribute-to-Sketch](#stage-1-attribute-to-sketch)
         - [Stage 2: Sketch-to-Sketch (S2S)](#stage-2-sketch-to-sketch-s2s)
         - [Stage 3: Sketch-to-Face (S2F)](#stage-3-sketch-to-face-s2f)
-    - [Experiments](#experiments)
+        - [Experiments](#experiments)
+    - [Progressive Growing of GANs for Improved Quality, Stability, and Variation](#progressive-growing-of-gans-for-improved-quality-stability-and-variation)
+        - [Main idea](#main-idea)
+        - [Progressive Growing of GANs](#progressive-growing-of-gans)
+        - [Increasing Variation](#increasing-variation)
+        - [Normalization in Generator and Discriminator](#normalization-in-generator-and-discriminator)
+        - [Multi-Scale Statistical Similarity for Assessing GAN Results](#multi-scale-statistical-similarity-for-assessing-gan-results)
+        - [Experiments](#experiments)
 
 <!-- /TOC -->
 
@@ -270,7 +277,6 @@ The encoder q(φ) takes sketch and attributes as input, whereas q(β) takes nois
 
 KL(Qφ(z|s a)||Pθ(z)) and KL(Qβ(z|n a)||Pθ(z)), are the regularization terms in order to enforce the latent variable z ~ Qφ(z|s a) and z ~ Qβ(z|n a) both match the prior normal distribution, Pθ(z).
 
-
 ### Stage 2: Sketch-to-Sketch (S2S)
 S2S network consists of a generator sub-network G2 (based on UNet and DenseNet architectures) conditioned on the encoded attribute vector from the A2S stage and a patch-based discriminator subnetwork D2. 
 
@@ -291,9 +297,69 @@ The network parameters for the S2F stage are learned by minimizing
 
 ![](img/FSASgan_loss3.png)
 
-## Experiments
+### Experiments
 the authors show the image synthesis capability of our network by manipulating the input attribute and noise vectors. Note that, the testing phase of our network takes attribute vector and noise as inputs and produces face reconstruction as the output. 
 
 ![](img/FSASgan_exp.png)
 
 ![](img/FSASgan_exp2.png)
+
+## Progressive Growing of GANs for Improved Quality, Stability, and Variation
+### Main idea
+1) The authors describe a new training methodology for GANs to grow both the generator and discriminator progressively: starting from a low resolution, we add new layers that model increasingly fine details as training progresss.
+2) The authors propose a simple way to increase the variation in generated images, describe several implementation details for balancing training and suggest a new metric for evaluating GAN results.
+
+### Progressive Growing of GANs
+
+![](img/pg_gan_growing.png)
+
+The incremental nature allows the training to first discover large-scale structure of the image distribution and then shift attention to increasingly finer scale detail, instead of having to learn all scales simultaneously. 
+
+![](img/pg_gan_fakeIn.png)
+
+When new layers are added to the networks, we fade them in smoothly, to avoid sudden shocks to the already well-trained, smaller-resolution layers.
+
+the progressive training has several benefits:
+1) the generation of smaller images is substantially more stable because there is less class information and fewer modes
+2) With progressively growing GANs most of the iterations are done at lower resolutions, and comparable result quality is often obtained up to 2–6 times faster
+
+### Increasing Variation
+GANs have a tendency to capture only a subset of the variation found in training data. The authors propose a simplified solution:
+1) first compute the standard deviation for each feature in each spatial location over the minibatch
+2) average these estimates over all features and spatial locations to arrive at a single value
+3) replicate the value and concatenate it to all spatial locations and over the minibatch, yielding one additional(constant) feature map. 
+
+![](img/pg_gan_ministd.png)
+
+### Normalization in Generator and Discriminator
+GANs are prone to the escalation of signal magnitudes as a result of unhealthy competition between the two networks. We use a different approach instead of  batch normalization to constrain signal magnitudes and competition, because the normalization methods were originally introduced to eliminate covariate shift.
+
+Equalized Learning Rate
+To be precise, we set w'(i) = w(i)/c, where w(i) are the weights and c is the per-layer normalization constant from He’s initializer. 
+
+![](img/pg_gan_equalized.png)
+
+These methods normalize a gradient update by its estimated standard deviation, thus making the update independent of the scale of the parameter.
+
+Pixelwise Feature Vector Normalization in Generator
+
+To disallow the scenario where the magnitudes in the generator and discriminator spiral out of control as a result of competition, we normalize the feature vector in each pixel to unit length in the generator after each convolutional layer.
+
+![](img/pg_gan_pixelwise_norm.png)
+
+### Multi-Scale Statistical Similarity for Assessing GAN Results
+The authors argue that existing methods such as MS-SSIM find large-scale mode collapses reliably but fail to react to smaller effects such as loss of variation in colors or textures, and they also do not directly assess image quality in terms of similarity to the training set.
+
+The authors propose to study this by considering the multiscale statistical similarity between distributions of local image patches drawn from Laplacian pyramid representations of generated and target images, starting at a low-pass resolution of 16 × 16 pixels.
+1) randomly sample 16384 images and extract 128 descriptors from each level in the Laplacian pyramid, giving us 221 (2.1M) descriptors per level. We denote the patches from level l of the training set and generated set as {x} and {y} respectively. 
+2) first normalize {x} and {y} w.r.t. the mean and standard deviation of each color channel
+3) and then estimate the statistical similarity by computing their sliced Wasserstein distance SWD, an efficiently computable randomized approximation to earthmovers distance, using 512 projections. 
+
+### Experiments
+importance of individual contributions in terms of statistical similarity
+
+![](img/pg_gan_exp.png)
+
+convergence and training speed
+
+![](img/pg_gan_exp_speed.png)

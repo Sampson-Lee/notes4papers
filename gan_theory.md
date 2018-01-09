@@ -37,6 +37,7 @@
         - [Equilibrium](#equilibrium)
         - [Boundary Equilibrium GAN](#boundary-equilibrium-gan)
         - [Convergence measure](#convergence-measure)
+    - [Least Squares Generative Adversarial Networks](#least-squares-generative-adversarial-networks)
     - [Wasserstein GAN](#wasserstein-gan)
         - [Main idea](#main-idea)
         - [analysis](#analysis)
@@ -302,6 +303,9 @@ The authors derive a global measure of convergence by using the equilibrium conc
 ![](img/began_conver.png)
 
 ![](img/began_conver2.png)
+
+
+## Least Squares Generative Adversarial Networks
 
 ## Wasserstein GAN
 ### Main idea
