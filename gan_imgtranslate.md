@@ -7,29 +7,31 @@
         - [Models](#models)
         - [Learning](#learning)
     - [Invertible Conditional GANs for image editing](#invertible-conditional-gans-for-image-editing)
-        - [Main idea](#main-idea)
+        - [Main idea](#main-idea-1)
         - [Motivation](#motivation)
         - [Encoder](#encoder)
         - [cGAN](#cgan)
-        - [Architecture](#architecture)
+        - [Architecture](#architecture-1)
     - [Image-to-image translation using conditional adversarial nets](#image-to-image-translation-using-conditional-adversarial-nets)
-        - [Main idea](#main-idea)
+        - [Main idea](#main-idea-2)
         - [Objective](#objective)
         - [Architrcture](#architrcture)
         - [Experiments](#experiments)
     - [Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks](#unpaired-image-to-image-translation-using-cycle-consistent-adversarial-networks)
-        - [Main idea](#main-idea)
-        - [Motivation](#motivation)
+        - [Main idea](#main-idea-3)
+        - [Motivation](#motivation-1)
         - [Formulation](#formulation)
         - [Training](#training)
     - [DeblurGAN: Blind Motion Deblurring Using Conditional Adversarial Networks](#deblurgan-blind-motion-deblurring-using-conditional-adversarial-networks)
-        - [Main idea](#main-idea)
+        - [Abstract](#abstract)
     - [StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation](#stargan-unified-generative-adversarial-networks-for-multi-domain-image-to-image-translation)
-        - [Main idea](#main-idea)
-        - [Motivation](#motivation)
+        - [Main idea](#main-idea-4)
+        - [Motivation](#motivation-2)
         - [Overview](#overview)
         - [Loss function](#loss-function)
         - [Training with Multiple Datasets](#training-with-multiple-datasets)
+    - [Translating and Segmenting Mutimodal Medical Volumes with Cycle and Shape Consistency Generative Adversarial Network](#translating-and-segmenting-mutimodal-medical-volumes-with-cycle-and-shape-consistency-generative-adversarial-network)
+        - [Abstract](#abstract-1)
 
 <!-- /TOC -->
 # Image translation
@@ -195,8 +197,20 @@ The aithors apply two techniques from recent works to stabilize our model traini
 - to reduce model oscillation, use a history of generated images rather than the ones produced by the latest generative networks, keeping an image buffer that stores the 50 previously generated images
 
 ## DeblurGAN: Blind Motion Deblurring Using Conditional Adversarial Networks
-### Main idea
+### Abstract
+We present an end-to-end learning approach for motion deblurring, which is based on conditional GAN and content loss.
 
+![](img/deblur_gan_architecture.png)
+
+![](img/deblur_gan_loss_function.png)
+
+ It improves the state-of-the art in terms of peak signal-to-noise ratio, structural similarity measure and by visual appearance. The quality of the deblurring model is also evaluated in a novel way on a real-world problem -- object detection on (de-)blurred images. The method is 5 times faster than the closest competitor. 
+
+Second, we present a novel method of generating synthetic motion blurred images from the sharp ones, which allows realistic dataset augmentation. 
+
+![](img/deblur_gan_Motion_blur_kernel_generation.png)
+
+Model, training code and dataset are available at [this https URL](https://github.com/KupynOrest/DeblurGAN)
 
 ## StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation
 ### Main idea
@@ -252,3 +266,19 @@ we introduce a mask vector m that allows StarGAN to ignore unspecified labels an
 where [·] refers to concatenation, and c(i) represents a vector for the labels of the i-th dataset, and m represents an n-dimensional one-hot vector, with n being the number of datasets.
 
 Training Strategy: we train the model in a multi-task learning setting, where the discriminator tries to minimize only the classification error associated to the known label, using mask vector.
+
+## Translating and Segmenting Mutimodal Medical Volumes with Cycle and Shape Consistency Generative Adversarial Network
+
+### Abstract
+Synthesized medical images have several important applications, e.g., as an intermedium in cross-modality image registration and as supplementary training samples to boost the generalization capability of a classifier. Especially, synthesized computed tomography (CT) data can provide X-ray attenuation map for radiation therapy planning. 
+
+In this work, we propose a generic cross-modality synthesis approach with the following targets: 1) synthesizing realistic looking 3D images using unpaired training data, 2) ensuring consistent anatomical structures, which could be changed by geometric distortion in cross-modality synthesis and 3) improving volume segmentation by using synthetic data for modalities with limited training samples. 
+
+![](img/translate_medical_volume_object.png)
+
+We show that these goals can be achieved with an end-to-end 3D convolutional neural network (CNN) composed of mutually-beneficial generators and segmentors for image synthesis and segmentation tasks. The generators are trained with an adversarial loss, a cycle-consistency loss, and also a shape-consistency loss, which is supervised by segmentors, to reduce the geometric distortion. From the segmentation view, the segmentors are boosted by synthetic data from generators in an online manner. Generators and segmentors prompt each other alternatively in an end-to-end training fashion. 
+
+![](img/translate_medical_volume.png)
+
+With extensive experiments on a dataset including a total of 4,496 CT and magnetic resonance imaging (MRI) cardiovascular volumes, we show both tasks are beneficial to each other and coupling these two tasks results in better performance than solving them exclusively.
+
